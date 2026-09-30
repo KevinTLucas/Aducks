@@ -106,9 +106,10 @@ none are ticked by default).
 - `{value}` is replaced with the user's input. It is OData-escaped (`'` becomes
   `''`), then URL-encoded. Values extracted by chain steps get the same
   treatment. If there is no `{value}`, no value box is shown.
-- A relative `Url` is added to the Graph v1.0 base. A full `http(s)://` URL is
-  used as the whole URL (no v1.0 prefix). `$select` is still appended, and spaces and `"` are
-  still encoded.
+- A relative `Url` is added to the Graph v1.0 base. A full URL is used as the
+  whole URL (no v1.0 prefix). `$select` is still appended, and spaces and `"`
+  are still encoded. Full URLs must be `https://graph.microsoft.com/...`:
+  `Invoke-GraphRequest` refuses every other host, so the token can't leak.
 - If a query has only one lookup, the lookup step is hidden.
 - `ValueLabel` / `ValueHint` (optional, per lookup) set the value box label
   (shown upper case; default "VALUE - <lookup label>") and placeholder.

@@ -17,6 +17,14 @@ function Invoke-GraphRequest {
         [string] $Method = 'GET',
         [hashtable] $Headers
     )
+    # Never send the token anywhere but Graph: a full URL in Advanced mode or a
+    # shared queries.json could otherwise point at another host and leak it.
+    $u = $null
+    if (-not [uri]::TryCreate($Uri, [UriKind]::Absolute, [ref]$u) -or $u.Scheme -ne 'https' -or $u.Host -ne 'graph.microsoft.com') {
+        $shown = if ($u) { "$($u.Scheme)://$($u.Host)" } else { $Uri }
+        return [PSCustomObject]@{ Ok = $false; StatusCode = $null; Data = $null; Unauthorized = $false
+            Error = "Blocked: Aducks only sends requests to https://graph.microsoft.com (not $shown), so your sign-in token can't leak to another site." }
+    }
     $h = @{ Authorization = "Bearer $AccessToken" }
     if ($Headers) { foreach ($k in $Headers.Keys) { $h[$k] = $Headers[$k] } }
     try {
@@ -53,6 +61,7 @@ function Get-GraphPhoto {
         [Parameter(Mandatory)][string] $AccessToken,
         [string] $Base = 'https://graph.microsoft.com/v1.0'
     )
+    if (([uri]"$Base/").Host -ne 'graph.microsoft.com' -or -not $Base.StartsWith('https://')) { return $null }   # token stays on Graph
     try {
         $resp = Invoke-WebRequest -Uri "$Base/me/photo/`$value" -Headers @{ Authorization = "Bearer $AccessToken" } `
                                   -UseBasicParsing -ErrorAction Stop
