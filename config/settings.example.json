@@ -1,0 +1,12 @@
+{
+  "_note": "Default settings. On first run Aducks copies this to settings.json (per-machine, not committed); edit that file or use the in-app Settings. Relaunch Aducks after editing by hand. (Graph endpoints and internal timings are built in - not configurable here on purpose.)",
+
+  "_browser_note": "Which browser to launch for login. Must be Chromium-based (login capture uses the DevTools protocol). Use 'edge', 'chrome', or a full path to a Chromium browser exe.",
+  "Browser": "edge",
+
+  "_signin_note": "CSS selector for the Graph Explorer button that opens the login prompt; it's clicked automatically once the page loads. Set to \"\" to disable auto-click. Only change this if Microsoft changes that button.",
+  "SignInSelector": "button[aria-label=\"Sign in\"]",
+
+  "_capture_note": "How many seconds to wait for you to finish signing in before giving up.",
+  "CaptureTimeoutSec": 300
+}

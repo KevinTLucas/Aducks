@@ -1,0 +1,59 @@
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Aducks - Settings"
+    Height="480" Width="620" MinHeight="420" MinWidth="500"
+    WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+    FontFamily="Segoe UI" Background="{DynamicResource BgBrush}">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Settings" Style="{DynamicResource H1}" />
+            <TextBlock Text="These options are saved to settings.json. Graph endpoints and internal timings are built in and not shown here."
+                       Foreground="{DynamicResource MutedBrush}" FontSize="13" TextWrapping="Wrap" Margin="0,2,0,0" />
+        </StackPanel>
+
+        <!-- Form -->
+        <Border Grid.Row="1" Style="{DynamicResource Card}" Margin="0" Padding="18">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="BROWSER" Style="{DynamicResource FieldLabel}" />
+                    <TextBlock Text="Which browser to launch for login. Must be Chromium-based. Use 'edge', 'chrome', or a full path to a browser .exe."
+                               Foreground="{DynamicResource MutedBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,4" />
+                    <TextBox x:Name="EditBrowser" Style="{DynamicResource InputBox}" Margin="0,0,0,16" />
+
+                    <TextBlock Text="SIGN-IN BUTTON SELECTOR" Style="{DynamicResource FieldLabel}" />
+                    <TextBlock Text="CSS selector for the Graph Explorer button that opens the login prompt; clicked automatically. Leave blank to disable auto-click. Only change if Microsoft changes that button."
+                               Foreground="{DynamicResource MutedBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,4" />
+                    <TextBox x:Name="EditSelector" Style="{DynamicResource InputBox}" Margin="0,0,0,16" />
+
+                    <TextBlock Text="LOGIN WAIT (SECONDS)" Style="{DynamicResource FieldLabel}" />
+                    <TextBlock Text="How long to wait for you to finish signing in before giving up."
+                               Foreground="{DynamicResource MutedBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,4" />
+                    <TextBox x:Name="EditTimeout" Style="{DynamicResource InputBox}" Width="120"
+                             HorizontalAlignment="Left" Margin="0,0,0,4" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Footer -->
+        <DockPanel Grid.Row="2" Margin="0,14,0,0">
+            <TextBlock Text="Changes apply the next time you sign in."
+                       DockPanel.Dock="Bottom" Foreground="{DynamicResource MutedBrush}" FontSize="11"
+                       TextWrapping="Wrap" Margin="0,12,0,0" />
+            <TextBlock x:Name="SettingsStatus" DockPanel.Dock="Left" Text="" VerticalAlignment="Center"
+                       FontSize="12" TextWrapping="Wrap" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="CancelButton" Content="Close" Style="{DynamicResource GhostButton}" Margin="0,0,8,0" />
+                <Button x:Name="SaveButton" Content="Save changes" Style="{DynamicResource AccentButton}" />
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

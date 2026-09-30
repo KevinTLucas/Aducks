@@ -1,0 +1,118 @@
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Aducks - Query catalog"
+    Height="660" Width="940" MinHeight="540" MinWidth="780"
+    WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+    FontFamily="Segoe UI" Background="{DynamicResource BgBrush}">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Query catalog" Style="{DynamicResource H1}" />
+            <TextBlock Text="Add and edit the queries that appear in Build a query. Changes are saved to queries.json."
+                       Foreground="{DynamicResource MutedBrush}" FontSize="13" Margin="0,2,0,0" />
+        </StackPanel>
+
+        <!-- Body: master (list) / detail (form) -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="290" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Master list -->
+            <Border Grid.Column="0" Style="{DynamicResource Card}" Margin="0" Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="QUERIES" Style="{DynamicResource FieldLabel}" Margin="2,0,0,8" />
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel x:Name="QueryListPanel" />
+                    </ScrollViewer>
+                    <Grid Grid.Row="2" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" x:Name="NewQueryButton" Content="+ New"
+                                Style="{DynamicResource GhostButton}" HorizontalAlignment="Stretch"
+                                ToolTip="Create a new, empty query" />
+                        <Button Grid.Column="2" x:Name="CloneQueryButton" Content="Clone"
+                                Style="{DynamicResource GhostButton}" HorizontalAlignment="Stretch"
+                                ToolTip="Duplicate the selected query as a starting point" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Detail form -->
+            <Border Grid.Column="2" Style="{DynamicResource Card}" Margin="0" Padding="18">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="FormPanel">
+                        <TextBlock x:Name="EmptyHint"
+                                   Text="Select a query on the left, or click + New to create one."
+                                   Foreground="{DynamicResource MutedBrush}" FontSize="13" TextWrapping="Wrap"
+                                   Visibility="Collapsed" />
+
+                        <StackPanel x:Name="FieldsPanel">
+                            <TextBlock Text="CATEGORY" Style="{DynamicResource FieldLabel}" />
+                            <TextBlock Text="Groups queries in the first dropdown. Pick an existing one or type a new name."
+                                       Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,0,0,4" />
+                            <ComboBox x:Name="EditCategory" Style="{DynamicResource ComboEditable}"
+                                      HorizontalAlignment="Left" Width="320" Margin="0,0,0,14" />
+
+                            <TextBlock Text="QUERY NAME" Style="{DynamicResource FieldLabel}" />
+                            <TextBlock Text="Shown in the second dropdown (What do you want to see?)."
+                                       Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,0,0,4" />
+                            <TextBox x:Name="EditName" Style="{DynamicResource InputBox}"
+                                     HorizontalAlignment="Left" Width="320" Margin="0,0,0,14" />
+
+                            <TextBlock Text="RETURN PROPERTIES" Style="{DynamicResource FieldLabel}" />
+                            <TextBlock Text="One field per line. These become the tickable list; leave empty for Graph defaults."
+                                       Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,0,0,4" />
+                            <TextBox x:Name="EditProps" Background="{DynamicResource PanelBrush2}"
+                                     Foreground="{DynamicResource TextBrush}" CaretBrush="{DynamicResource TextBrush}"
+                                     BorderBrush="{DynamicResource BorderBrush2}" BorderThickness="1"
+                                     FontFamily="Consolas, Cascadia Mono, monospace" FontSize="12" Padding="8"
+                                     AcceptsReturn="True" TextWrapping="NoWrap" MinHeight="96" MaxWidth="520"
+                                     HorizontalAlignment="Left" HorizontalScrollBarVisibility="Auto"
+                                     VerticalScrollBarVisibility="Auto" Margin="0,0,0,16" />
+
+                            <DockPanel Margin="0,0,0,4">
+                                <Button x:Name="AddLookupButton" DockPanel.Dock="Right" Content="+ Add lookup"
+                                        Style="{DynamicResource GhostButton}" Padding="10,5" FontSize="11" />
+                                <TextBlock Text="LOOKUPS" Style="{DynamicResource FieldLabel}" VerticalAlignment="Center" />
+                            </DockPanel>
+                            <TextBlock Text="Each lookup is one way to find this (by name, by ID...). Put {value} in the URL where the user's input goes; omit it for a query that needs no input."
+                                       Foreground="{DynamicResource MutedBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,8" />
+                            <StackPanel x:Name="LookupsPanel" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- Footer -->
+        <DockPanel Grid.Row="2" Margin="0,16,0,0">
+            <Button x:Name="DeleteQueryButton" DockPanel.Dock="Left" Content="Delete query"
+                    Style="{DynamicResource GhostButton}" />
+            <TextBlock x:Name="EditorStatus" DockPanel.Dock="Left" Text="" VerticalAlignment="Center"
+                       Margin="14,0,0,0" FontSize="12" TextWrapping="Wrap" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="CancelButton" Content="Close" Style="{DynamicResource GhostButton}" Margin="0,0,8,0" />
+                <Button x:Name="SaveButton" Content="Save changes" Style="{DynamicResource AccentButton}" />
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,557 @@
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Aducks"
+    Height="880" Width="1000" MinHeight="780" MinWidth="820"
+    WindowStartupLocation="CenterScreen"
+    FontFamily="Segoe UI"
+    Background="{DynamicResource BgBrush}">
+
+    <Grid>
+        <Grid.Background>
+            <!-- Subtle dark gradient so the signed-in app has depth (the login
+                 backdrop sits on top of this when signed out). -->
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#0C111B" Offset="0" />
+                <GradientStop Color="#0E1522" Offset="0.5" />
+                <GradientStop Color="#0A0E17" Offset="1" />
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- ==================== STATIC LOGIN BACKDROP ==================== -->
+        <Grid x:Name="LoginBackdrop">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#080B12" Offset="0" />
+                    <GradientStop Color="#0D1524" Offset="0.55" />
+                    <GradientStop Color="#080A11" Offset="1" />
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <!-- Static centered depth glow behind the card -->
+            <Ellipse Width="1200" Height="1200" HorizontalAlignment="Center" VerticalAlignment="Center"
+                     Opacity="0.55" IsHitTestVisible="False">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="#4D5B93F7" Offset="0" />
+                        <GradientStop Color="#1A6C4FE0" Offset="0.45" />
+                        <GradientStop Color="#00000000" Offset="0.75" />
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+
+            <!-- Vignette: darkens the edges for depth. -->
+            <Rectangle IsHitTestVisible="False">
+                <Rectangle.Fill>
+                    <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" RadiusX="0.75" RadiusY="0.75">
+                        <GradientStop Color="#00000000" Offset="0.55" />
+                        <GradientStop Color="#66060810" Offset="0.85" />
+                        <GradientStop Color="#CC050709" Offset="1" />
+                    </RadialGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+        </Grid>
+
+        <!-- ==================== SIGNED-OUT ==================== -->
+        <Border x:Name="SignedOutPanel" HorizontalAlignment="Center" VerticalAlignment="Center"
+                Width="440" CornerRadius="20" Padding="46,42" BorderThickness="1"
+                RenderTransformOrigin="0.5,0.5">
+            <Border.Background>
+                <!-- top-lit translucent glass -->
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#B01B2540" Offset="0" />
+                    <GradientStop Color="#B00C1220" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.BorderBrush>
+                <!-- bright top edge fading down = lit glass rim -->
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#4DFFFFFF" Offset="0" />
+                    <GradientStop Color="#0FFFFFFF" Offset="0.5" />
+                    <GradientStop Color="#1A6C4FE0" Offset="1" />
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+            <Border.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform x:Name="SignedOutS" ScaleX="0.96" ScaleY="0.96" />
+                    <TranslateTransform x:Name="SignedOutT" Y="26" />
+                </TransformGroup>
+            </Border.RenderTransform>
+            <Border.Effect><DropShadowEffect Color="#0A1830" BlurRadius="60" ShadowDepth="16" Opacity="0.7" /></Border.Effect>
+            <StackPanel>
+
+            <TextBlock Text="Aducks" FontSize="46" FontWeight="Bold" HorizontalAlignment="Center">
+                <TextBlock.Foreground>
+                    <LinearGradientBrush x:Name="TitleBrush" StartPoint="-0.6,0" EndPoint="0.4,0">
+                        <GradientStop Color="#5B93F7" Offset="0" />
+                        <GradientStop Color="#EAF1FF" Offset="0.5" />
+                        <GradientStop Color="#A66BF0" Offset="1" />
+                    </LinearGradientBrush>
+                </TextBlock.Foreground>
+                <TextBlock.Effect><DropShadowEffect Color="#5B93F7" BlurRadius="34" ShadowDepth="0" Opacity="0.55" /></TextBlock.Effect>
+            </TextBlock>
+            <TextBlock Text="Microsoft Graph query builder" Foreground="#AEB9CC"
+                       FontSize="14" HorizontalAlignment="Center" TextAlignment="Center"
+                       TextWrapping="Wrap" Margin="0,8,0,26" />
+            <TextBlock Text="Sign in with your Microsoft account. Your token is captured automatically."
+                       Foreground="{DynamicResource MutedBrush}" FontSize="13" TextAlignment="Center"
+                       TextWrapping="Wrap" Margin="0,0,0,24" />
+            <Button x:Name="AuthenticateButton" Content="Sign in with Microsoft" FontSize="15"
+                    Style="{DynamicResource AccentButton}" HorizontalAlignment="Stretch" Padding="0,14">
+                <Button.Effect><DropShadowEffect x:Name="AuthGlow" Color="#5B93F7" BlurRadius="22" ShadowDepth="0" Opacity="0.5" /></Button.Effect>
+            </Button>
+            <Button x:Name="PreviewButton" Content="Preview without signing in"
+                    Style="{DynamicResource GhostButton}" HorizontalAlignment="Center" Margin="0,14,0,0" />
+            <TextBlock x:Name="HomeStatusText" Text="" Foreground="{DynamicResource WarnBrush}"
+                       FontSize="12" TextAlignment="Center" TextWrapping="Wrap" Margin="0,16,0,0" />
+            </StackPanel>
+        </Border>
+
+        <!-- ==================== SIGNED-IN ==================== -->
+        <!-- No page-level scroll: the window is a fixed shell. The builder sits
+             in an Auto row, the results card fills the "*" row, and the JSON
+             RichTextBox owns its own scrollbar (so Find can scroll to a match).
+             Both sections carry a MinHeight so neither collapses. -->
+        <Grid x:Name="SignedInRoot" Visibility="Collapsed" Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <!-- ~300px of tree once the card's header + padding are counted -->
+                <RowDefinition Height="*" MinHeight="380" />
+            </Grid.RowDefinitions>
+
+            <!-- Top bar -->
+            <DockPanel x:Name="TopBar" Grid.Row="0" Margin="0,0,0,18">
+                <Button x:Name="ProfileButton" DockPanel.Dock="Right" Style="{DynamicResource ProfilePill}"
+                        ToolTip="Account details, session time, and sign out" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <Grid Width="26" Height="26" Margin="0,0,10,0" VerticalAlignment="Center">
+                            <Ellipse x:Name="PillAvatar" Width="26" Height="26" Fill="{DynamicResource AccentBrush2}" />
+                            <Image x:Name="PillAvatarImg" Width="26" Height="26" Stretch="UniformToFill"
+                                   Visibility="Collapsed" RenderOptions.BitmapScalingMode="HighQuality">
+                                <Image.Clip><EllipseGeometry Center="13,13" RadiusX="13" RadiusY="13" /></Image.Clip>
+                            </Image>
+                            <TextBlock x:Name="PillAvatarInitials" Text="" Foreground="White" FontSize="11"
+                                       FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Grid>
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                            <TextBlock x:Name="PillNameText" Text="AUTHENTICATED" Foreground="{DynamicResource MutedBrush}"
+                                       FontSize="9" FontWeight="SemiBold" />
+                            <TextBlock x:Name="ProfileCountText" Text="00:00:00 left"
+                                       Foreground="{DynamicResource TextBrush}" FontSize="13" FontWeight="SemiBold" />
+                        </StackPanel>
+                        <Path Data="M0,0 L8,0 L4,5 Z" Fill="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <StackPanel>
+                    <TextBlock Text="Aducks" FontSize="26" FontWeight="Bold">
+                        <TextBlock.Foreground>
+                            <!-- Same gradient + colours as the login wordmark; animated below. -->
+                            <LinearGradientBrush x:Name="BrandBrush" StartPoint="-0.6,0" EndPoint="0.4,0">
+                                <GradientStop Color="#5B93F7" Offset="0" />
+                                <GradientStop Color="#EAF1FF" Offset="0.5" />
+                                <GradientStop Color="#A66BF0" Offset="1" />
+                            </LinearGradientBrush>
+                        </TextBlock.Foreground>
+                        <TextBlock.Effect><DropShadowEffect Color="#5B93F7" BlurRadius="22" ShadowDepth="0" Opacity="0.45" /></TextBlock.Effect>
+                    </TextBlock>
+                    <TextBlock Text="Microsoft Graph query builder" Foreground="{DynamicResource MutedBrush}" FontSize="13" Margin="0,1,0,0" />
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Query builder -->
+            <!-- MaxHeight is set in code (SizeChanged handler) so the results row
+                 keeps its MinHeight. Header + Run stay pinned; the fields between
+                 them scroll when space is tight. -->
+            <Border x:Name="BuilderCard" Grid.Row="1" Style="{DynamicResource Card}">
+                <DockPanel>
+                    <!-- Card header + advanced toggle -->
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <!-- Card action (far right): manage the query catalog. Labelled + a
+                             distinct edit icon + a divider so it doesn't read as part of the
+                             Advanced mode toggle beside it. -->
+                        <Button x:Name="SettingsButton" DockPanel.Dock="Right" Style="{DynamicResource GhostButton}"
+                                Padding="11,6" FontSize="12" VerticalAlignment="Center"
+                                ToolTip="Add, edit or remove the queries shown in these dropdowns (edits queries.json)">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE70F;" FontSize="13"
+                                           Margin="0,0,7,0" VerticalAlignment="Center" />
+                                <TextBlock Text="Edit queries" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Border DockPanel.Dock="Right" Width="1" Background="{DynamicResource BorderBrush2}" Margin="14,2,14,2" />
+                        <CheckBox x:Name="AdvancedToggle" DockPanel.Dock="Right" Content="Advanced"
+                                  Style="{DynamicResource Check}" Margin="0" VerticalAlignment="Center"
+                                  ToolTip="Show and edit the raw Graph request URL for custom queries" />
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="3" Height="18" CornerRadius="2" Background="{DynamicResource AccentBrush}"
+                                    Margin="0,0,10,0" VerticalAlignment="Center" />
+                            <TextBlock Text="Build a query" Style="{DynamicResource H2}" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <Button x:Name="RunButton" DockPanel.Dock="Bottom" Content="Run query" Style="{DynamicResource AccentButton}"
+                            HorizontalAlignment="Left" Margin="0,14,0,0" />
+
+                    <!-- Scrollbar (17px) sits in the card's right padding: the content
+                         reserves that gutter only while the scrollbar is hidden, so the
+                         fields' right edge never moves. -->
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-17,0">
+                    <StackPanel>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Margin" Value="0,0,17,0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ComputedVerticalScrollBarVisibility, RelativeSource={RelativeSource AncestorType=ScrollViewer}}" Value="Visible">
+                                        <Setter Property="Margin" Value="0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                    <!-- Fields flow left-to-right in two columns. UniformGrid skips
+                         collapsed children, so auto-hidden steps leave no gaps. Every
+                         cell has the same 10px side margin (the grid's -10 cancels the
+                         outer edges), so it doesn't matter which column a cell lands in. -->
+                    <UniformGrid Columns="2" Margin="-10,0,-10,-14">
+                        <!-- Step 1: category (label text set from settings.json) -->
+                        <StackPanel Margin="10,0,10,14">
+                            <TextBlock x:Name="CategoryLabel" Text="WHAT ARE YOU LOOKING FOR?" Style="{DynamicResource FieldLabel}" />
+                            <ComboBox x:Name="CategoryCombo" Style="{DynamicResource Combo}" />
+                        </StackPanel>
+
+                        <!-- Step 2: query -->
+                        <StackPanel Margin="10,0,10,14">
+                            <TextBlock x:Name="QueryLabel" Text="WHAT DO YOU WANT TO SEE?" Style="{DynamicResource FieldLabel}" />
+                            <ComboBox x:Name="ActionCombo" Style="{DynamicResource Combo}" />
+                        </StackPanel>
+
+                        <!-- Step 3: how to find it (auto-hidden when there's only one way) -->
+                        <StackPanel x:Name="StepLookup" Margin="10,0,10,14">
+                            <TextBlock x:Name="LookupLabel" Text="HOW DO YOU WANT TO FIND IT?" Style="{DynamicResource FieldLabel}" />
+                            <ComboBox x:Name="LookupCombo" Style="{DynamicResource Combo}" />
+                        </StackPanel>
+
+                        <!-- Step 4: value (auto-hidden when the URL has no {value}, e.g. "me") -->
+                        <StackPanel x:Name="StepValue" Margin="10,0,10,14">
+                            <TextBlock x:Name="ValueLabel" Text="VALUE" Style="{DynamicResource FieldLabel}" />
+                            <Grid>
+                                <TextBox x:Name="ValueBox" Style="{DynamicResource InputBox}" />
+                                <TextBlock x:Name="ValueWatermark" IsHitTestVisible="False"
+                                           Foreground="{DynamicResource MutedBrush}" FontSize="13"
+                                           VerticalAlignment="Center" Margin="12,0,0,0" />
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Return properties -->
+                        <StackPanel x:Name="StepProps" Margin="10,0,10,14">
+                            <TextBlock Text="RETURN PROPERTIES" Style="{DynamicResource FieldLabel}" />
+                            <Button x:Name="PropsButton" Style="{DynamicResource DropdownButton}">
+                                <TextBlock x:Name="PropsButtonText" Text="Default" />
+                            </Button>
+                        </StackPanel>
+                    </UniformGrid>
+
+                    <Popup x:Name="PropsPopup" PlacementTarget="{Binding ElementName=PropsButton}"
+                           Placement="Bottom" StaysOpen="False" AllowsTransparency="True">
+                        <Border Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush2}"
+                                BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,4,0,0"
+                                Width="{Binding ActualWidth, ElementName=PropsButton}" MinWidth="320">
+                            <StackPanel>
+                                <!-- Search with a magnifier glyph on the left + watermark. -->
+                                <Grid Margin="0,0,0,8">
+                                    <TextBox x:Name="PropsSearch" Style="{DynamicResource SearchInputBox}" />
+                                    <Canvas Width="16" Height="16" HorizontalAlignment="Left" Margin="11,0,0,0"
+                                            VerticalAlignment="Center" IsHitTestVisible="False">
+                                        <Ellipse Canvas.Left="0" Canvas.Top="0" Width="11" Height="11"
+                                                 Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.6" />
+                                        <Line X1="10" Y1="10" X2="15" Y2="15"
+                                              Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.6" />
+                                    </Canvas>
+                                    <TextBlock x:Name="PropsSearchWatermark" Text="Search properties"
+                                               IsHitTestVisible="False" Foreground="{DynamicResource MutedBrush}"
+                                               FontSize="13" VerticalAlignment="Center" Margin="34,0,0,0" />
+                                </Grid>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button x:Name="PropsSelectAll" Grid.Column="0" Content="Select all"
+                                            Style="{DynamicResource GhostButton}" Padding="10,5" FontSize="11" Margin="0,0,3,0" />
+                                    <Button x:Name="PropsClear" Grid.Column="1" Content="Clear"
+                                            Style="{DynamicResource GhostButton}" Padding="10,5" FontSize="11" Margin="3,0,0,0" />
+                                </Grid>
+                                <ScrollViewer MaxHeight="240" VerticalScrollBarVisibility="Auto">
+                                    <StackPanel x:Name="PropsList" />
+                                </ScrollViewer>
+                            </StackPanel>
+                        </Border>
+                    </Popup>
+
+                    <!-- Advanced: shown only in Advanced mode -->
+                    <StackPanel x:Name="StepAdvanced" Margin="0,14,0,0" Visibility="Collapsed">
+                        <!-- Single-URL editor (non-chained lookups) -->
+                        <StackPanel x:Name="AdvancedSinglePanel">
+                            <TextBlock Text="REQUEST URL" Style="{DynamicResource FieldLabel}" />
+                            <TextBox x:Name="AdvancedUrlBox" Background="{DynamicResource PanelBrush2}"
+                                     Foreground="{DynamicResource TextBrush}" CaretBrush="{DynamicResource TextBrush}"
+                                     BorderBrush="{DynamicResource BorderBrush2}" BorderThickness="1"
+                                     FontFamily="Consolas, Cascadia Mono, monospace" FontSize="12" Padding="8"
+                                     TextWrapping="Wrap" AcceptsReturn="True" MinHeight="40" MaxHeight="96"
+                                     VerticalScrollBarVisibility="Auto" />
+                            <TextBlock Text="Edit freely to run any Graph endpoint. Changing the dropdowns above rebuilds this."
+                                       Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,4,0,0" />
+                        </StackPanel>
+                        <!-- Chained request: one read-only box per step (built in code) -->
+                        <StackPanel x:Name="AdvancedChainPanel" Visibility="Collapsed">
+                            <TextBlock Text="CHAINED REQUEST   (runs top to bottom)" Style="{DynamicResource FieldLabel}" />
+                            <ScrollViewer MaxHeight="170" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <StackPanel x:Name="AdvancedStepsHost" Margin="0,4,0,0" />
+                            </ScrollViewer>
+                            <TextBlock Text="Runs automatically; the last step's result is shown, and Return Properties apply to it."
+                                       Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,4,0,0" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- Results -->
+            <Border Grid.Row="2" Style="{DynamicResource Card}" Margin="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                        <!-- Find bar (search box + prev/next + match count) then Copy / Load more -->
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Grid Width="190">
+                                <TextBox x:Name="SearchBox" Style="{DynamicResource SearchInputBox}" />
+                                <Canvas Width="16" Height="16" HorizontalAlignment="Left" Margin="11,0,0,0"
+                                        VerticalAlignment="Center" IsHitTestVisible="False">
+                                    <Ellipse Canvas.Left="0" Canvas.Top="0" Width="11" Height="11"
+                                             Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.6" />
+                                    <Line X1="10" Y1="10" X2="15" Y2="15"
+                                          Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.6" />
+                                </Canvas>
+                                <TextBlock x:Name="SearchWatermark" Text="Search results" IsHitTestVisible="False"
+                                           Foreground="{DynamicResource MutedBrush}" FontSize="13"
+                                           VerticalAlignment="Center" Margin="34,0,0,0" />
+                            </Grid>
+                            <Button x:Name="FindPrevButton" Content="Prev" Style="{DynamicResource GhostButton}"
+                                    Margin="6,0,0,0" ToolTip="Previous match (Shift+Enter)" />
+                            <Button x:Name="FindNextButton" Content="Next" Style="{DynamicResource GhostButton}"
+                                    Margin="6,0,0,0" ToolTip="Next match (Enter)" />
+                            <TextBlock x:Name="FindCountText" Text="" Foreground="{DynamicResource MutedBrush}"
+                                       FontSize="12" VerticalAlignment="Center" MinWidth="60" Margin="10,0,4,0" />
+                            <Border Width="1" Background="{DynamicResource BorderBrush2}" Margin="6,2,10,2" />
+                            <Button x:Name="ExpandAllButton" Style="{DynamicResource IconGhost}" Content="&#xE710;"
+                                    FontSize="13" ToolTip="Expand all" />
+                            <Button x:Name="CollapseAllButton" Style="{DynamicResource IconGhost}" Content="&#xE738;"
+                                    FontSize="13" Margin="2,0,8,0" ToolTip="Collapse all" />
+                            <Button x:Name="CopyResultButton" Content="Copy" Style="{DynamicResource GhostButton}" />
+                            <Button x:Name="LoadMoreButton" Content="Load more" Style="{DynamicResource GhostButton}"
+                                    Margin="6,0,0,0" Visibility="Collapsed"
+                                    ToolTip="This query returned more than one page. Fetch the next page from Graph and add it to the results below." />
+                        </StackPanel>
+                        <!-- DockPanel (not a horizontal StackPanel) so the status gets a
+                             finite width and can trim with an ellipsis. -->
+                        <DockPanel VerticalAlignment="Center">
+                            <Border DockPanel.Dock="Left" Width="3" Height="18" CornerRadius="2" Background="{DynamicResource AccentBrush}"
+                                    Margin="0,0,10,0" VerticalAlignment="Center" />
+                            <TextBlock x:Name="ResultStatus" Text="Results" Style="{DynamicResource H2}"
+                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                       ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
+                        </DockPanel>
+                    </DockPanel>
+
+                    <Grid Grid.Row="1">
+                        <Border Background="{DynamicResource PanelBrush2}" CornerRadius="8"
+                                BorderBrush="{DynamicResource BorderBrush2}" BorderThickness="1">
+                            <Grid>
+                                <!-- Collapsible tree of the result (default view) -->
+                                <TreeView x:Name="ResultTree" Background="Transparent" BorderThickness="0"
+                                          Padding="6" Foreground="{DynamicResource TextBrush}"
+                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                          VirtualizingStackPanel.IsVirtualizing="False" />
+                                <!-- Message fallback (running / preview / errors / empty) -->
+                                <TextBlock x:Name="ResultMessage" Visibility="Collapsed" Margin="12"
+                                           Foreground="{DynamicResource TextBrush}"
+                                           FontFamily="Consolas, Cascadia Mono, monospace" FontSize="12"
+                                           TextWrapping="Wrap" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Loading overlay: dims the results and spins while a query runs. -->
+                        <Border x:Name="ResultSpinner" Visibility="Collapsed" CornerRadius="8" Background="#C00E1420">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Canvas Width="46" Height="46" HorizontalAlignment="Center">
+                                    <Ellipse Canvas.Left="0" Canvas.Top="0" Width="46" Height="46"
+                                             Stroke="#26324A" StrokeThickness="4" />
+                                    <Path Stroke="{DynamicResource AccentBrush}" StrokeThickness="4"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M23,3 A20,20 0 0 1 43,23">
+                                        <Path.RenderTransform>
+                                            <RotateTransform x:Name="SpinnerRotate" CenterX="23" CenterY="23" />
+                                        </Path.RenderTransform>
+                                    </Path>
+                                </Canvas>
+                                <TextBlock x:Name="SpinnerText" Text="Running query..." Foreground="{DynamicResource MutedBrush}"
+                                           FontSize="12" HorizontalAlignment="Center" Margin="0,14,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Profile popup (account menu) -->
+            <Popup x:Name="ProfilePopup" PlacementTarget="{Binding ElementName=ProfileButton}"
+                   Placement="Bottom" StaysOpen="False" AllowsTransparency="True" HorizontalOffset="-104">
+                <Border BorderThickness="1" CornerRadius="12" Width="380" Margin="0,8,0,0">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#1B2536" Offset="0" />
+                            <GradientStop Color="#141B29" Offset="1" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.BorderBrush>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#2EFFFFFF" Offset="0" />
+                            <GradientStop Color="#233350" Offset="0.5" />
+                            <GradientStop Color="#1B2740" Offset="1" />
+                        </LinearGradientBrush>
+                    </Border.BorderBrush>
+                    <Border.Effect><DropShadowEffect Color="#000000" BlurRadius="26" ShadowDepth="7" Opacity="0.5" /></Border.Effect>
+                    <StackPanel>
+
+                        <!-- 1) Identity: who you are, with the settings cog -->
+                        <Grid Margin="18,18,14,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0" Width="46" Height="46" Margin="0,0,12,0" VerticalAlignment="Top">
+                                <Ellipse x:Name="PopupAvatar" Width="46" Height="46" Fill="{DynamicResource AccentBrush2}" />
+                                <Image x:Name="PopupAvatarImg" Width="46" Height="46" Stretch="UniformToFill"
+                                       Visibility="Collapsed" RenderOptions.BitmapScalingMode="HighQuality">
+                                    <Image.Clip><EllipseGeometry Center="23,23" RadiusX="23" RadiusY="23" /></Image.Clip>
+                                </Image>
+                                <TextBlock x:Name="PopupAvatarInitials" Text="" Foreground="White" FontSize="17"
+                                           FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Grid>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock x:Name="PopupUserText" Text="-" Foreground="{DynamicResource TextBrush}"
+                                           FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                <TextBlock x:Name="PopupEmailText" Text="-" Foreground="{DynamicResource MutedBrush}"
+                                           FontSize="12" TextWrapping="Wrap" Margin="0,1,0,0" />
+                                <Border x:Name="PopupAccountBadge" Background="{DynamicResource PanelBrush2}" CornerRadius="4"
+                                        Padding="7,2" HorizontalAlignment="Left" Margin="0,6,0,0">
+                                    <TextBlock x:Name="PopupAccountType" Text="" Foreground="{DynamicResource MutedBrush}"
+                                               FontSize="10" FontWeight="SemiBold" />
+                                </Border>
+                            </StackPanel>
+                            <Button x:Name="ProfileSettingsButton" Grid.Column="2" Style="{DynamicResource IconButton}"
+                                    Content="&#xE713;" Padding="7,5" FontSize="15" VerticalAlignment="Top"
+                                    ToolTip="Settings - browser, sign-in, login wait" />
+                        </Grid>
+
+                        <Border Height="1" Background="{DynamicResource BorderBrush2}" />
+
+                        <!-- 2) Session: countdown hero + a clear, dated expiry time -->
+                        <StackPanel Margin="18,14,18,14">
+                            <TextBlock Text="SESSION" Style="{DynamicResource FieldLabel}" Margin="0,0,0,6" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="PopupRemainingText" Text="-" Foreground="{DynamicResource GoodBrush}"
+                                           FontSize="30" FontWeight="SemiBold" />
+                                <TextBlock Text="left" Foreground="{DynamicResource MutedBrush}" FontSize="13"
+                                           VerticalAlignment="Bottom" Margin="8,0,0,5" />
+                            </StackPanel>
+                            <DockPanel Margin="0,10,0,0">
+                                <TextBlock Text="&#xE787;" FontFamily="Segoe MDL2 Assets" FontSize="12"
+                                           Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center"
+                                           DockPanel.Dock="Left" Margin="0,0,7,0" />
+                                <TextBlock x:Name="PopupExpiresText" Text="-" Foreground="{DynamicResource TextBrush}"
+                                           FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                            </DockPanel>
+                            <TextBlock x:Name="PopupAppText" Text="" Foreground="{DynamicResource MutedBrush}"
+                                       FontSize="11" Margin="0,6,0,0" />
+                        </StackPanel>
+
+                        <Border Height="1" Background="{DynamicResource BorderBrush2}" />
+
+                        <!-- 3) Directory identifiers (copyable) + scopes -->
+                        <StackPanel Margin="18,14,18,14">
+                            <TextBlock Text="DIRECTORY" Style="{DynamicResource FieldLabel}" Margin="0,0,0,6" />
+
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="78" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Tenant" Foreground="{DynamicResource MutedBrush}" FontSize="12" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" x:Name="PopupTenantText" Text="-" Foreground="{DynamicResource TextBrush}"
+                                           FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                            </Grid>
+
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="78" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Tenant ID" Foreground="{DynamicResource MutedBrush}" FontSize="12" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" x:Name="PopupTenantIdText" Text="-" Foreground="{DynamicResource TextBrush}"
+                                           FontFamily="Consolas, Cascadia Mono, monospace" FontSize="11" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" Margin="0,0,6,0" />
+                                <Button Grid.Column="2" x:Name="CopyTenantIdButton" Style="{DynamicResource IconGhost}"
+                                        Content="&#xE8C8;" ToolTip="Copy tenant ID" />
+                            </Grid>
+
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="78" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Object ID" Foreground="{DynamicResource MutedBrush}" FontSize="12" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" x:Name="PopupObjectIdText" Text="-" Foreground="{DynamicResource TextBrush}"
+                                           FontFamily="Consolas, Cascadia Mono, monospace" FontSize="11" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" Margin="0,0,6,0" />
+                                <Button Grid.Column="2" x:Name="CopyObjectIdButton" Style="{DynamicResource IconGhost}"
+                                        Content="&#xE8C8;" ToolTip="Copy your object ID" />
+                            </Grid>
+
+                            <DockPanel Margin="0,0,0,4">
+                                <TextBlock x:Name="ScopesCountText" DockPanel.Dock="Right" Text="" Foreground="{DynamicResource MutedBrush}"
+                                           FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                <TextBlock Text="SCOPES" Style="{DynamicResource FieldLabel}" Margin="0" />
+                            </DockPanel>
+                            <ScrollViewer MaxHeight="78" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <WrapPanel x:Name="PopupScopesPanel" Orientation="Horizontal" />
+                            </ScrollViewer>
+                        </StackPanel>
+
+                        <Border Height="1" Background="{DynamicResource BorderBrush2}" />
+
+                        <!-- 4) Actions: destructive (left) vs secondary + primary (right) -->
+                        <DockPanel Margin="18,14,18,18">
+                            <Button x:Name="SignOutButton" DockPanel.Dock="Left" Content="Sign out"
+                                    Style="{DynamicResource GhostButton}" Foreground="{DynamicResource BadBrush}" Padding="12,7" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button x:Name="CopyTokenButton" Content="Copy token"
+                                        Style="{DynamicResource GhostButton}" Padding="12,7" Margin="0,0,8,0" />
+                                <Button x:Name="ReauthButton" Content="Reauthenticate"
+                                        Style="{DynamicResource AccentButton}" FontSize="13" Padding="16,7" />
+                            </StackPanel>
+                        </DockPanel>
+                    </StackPanel>
+                </Border>
+            </Popup>
+        </Grid>
+    </Grid>
+</Window>

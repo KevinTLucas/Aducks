@@ -1,0 +1,17 @@
+# Per-machine settings (browser path etc.). Created from
+# config/settings.example.json on first run.
+config/settings.json
+
+# Claude Code local session files
+.claude/
+
+# Logs / scratch
+*.log
+*.tmp
+
+# OS / editor noise
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
