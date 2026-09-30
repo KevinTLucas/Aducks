@@ -24,8 +24,8 @@ permissions an admin must approve; see [Troubleshooting](#troubleshooting).)
      files as "from the internet", and that blocks Aducks' JSON component from
      loading. Already extracted it? Run this in PowerShell inside the folder:
      `Get-ChildItem -Recurse | Unblock-File`
-2. Open the **Aducks** folder and double-click **`Aducks.vbs`**. (`Aducks.bat`
-   does the same thing.)
+2. Open the **Aducks** folder and double-click **`Aducks.bat`**. A black window
+   may flash for a moment; that's normal.
 3. Click **Sign in with Microsoft**. The button changes to *Waiting for sign-in...*
 4. A browser window opens at Graph Explorer and the Microsoft sign-in prompt
    appears. Sign in the way you normally do (password, MFA, etc.).
@@ -225,7 +225,7 @@ apply the next time you sign in.
 | **Authentication failed: …Could not reach the browser's remote-debugging endpoint…** | Your PC's policy may block the browser feature Aducks relies on. Try another browser in Settings. If every browser fails, Aducks can't sign in on this PC |
 | **Authentication failed: …Browser path not found…** | The **Browser** setting points to a browser that isn't installed. Click **Preview without signing in**, open Settings (pill > gear), set **Browser** to `edge`, save, then **Sign out** and sign in again |
 | **Authentication failed** mentioning the WebSocket or connection being closed | The browser was closed before sign-in finished. Just sign in again |
-| **Double-clicking Aducks.vbs does nothing** | PowerShell may be blocked on this PC. Run **`Aducks-debug.bat`** to see the startup error in a console window |
+| **Double-clicking Aducks.bat does nothing** | PowerShell may be blocked on this PC. Run **`Aducks-debug.bat`** to see the startup error in a console window |
 
 ---
 

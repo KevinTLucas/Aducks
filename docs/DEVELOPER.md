@@ -39,8 +39,7 @@ neither built yet, are a loopback PKCE flow or reading the browser's MSAL cache.
 
 | Launcher | Use |
 |---|---|
-| `Aducks.vbs` | Normal use. Runs PowerShell hidden |
-| `Aducks.bat` | Delegates to `Aducks.vbs` |
+| `Aducks.bat` | Normal use. Starts PowerShell minimized + hidden (brief console flash). No VBScript, which Microsoft is phasing out |
 | `Aducks-debug.bat` | Visible console (`-NoExit`, `$VerbosePreference='Continue'`). Shows startup errors |
 | `powershell -NoProfile -ExecutionPolicy Bypass -STA -File src\Main.ps1 -Preview` | Preview mode with fake data, no sign-in |
 | add `-NoActivate` | Opens without taking focus. Use it for automated UI tests so they can't catch the user's typing |
@@ -61,7 +60,7 @@ Every request is a GET. Query and Load more requests also send
 ## Project layout
 
 ```
-Aducks.vbs / .bat         Launchers (hidden)
+Aducks.bat                Launcher (hidden)
 Aducks-debug.bat          Launcher with console (shows startup errors)
 config/
   settings.example.json   Default settings (committed)
