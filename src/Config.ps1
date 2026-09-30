@@ -35,10 +35,6 @@ function Read-AducksJson {
     catch { throw "Invalid JSON in $path : $($_.Exception.Message)" }
 }
 
-# settings.json is per-machine (git-ignored); a fresh copy starts from the example.
-$settingsPath = Join-Path $script:AducksConfigDir 'settings.json'
-if (-not (Test-Path $settingsPath)) { Copy-Item (Join-Path $script:AducksConfigDir 'settings.example.json') $settingsPath }
-
 $script:AducksSettings   = Read-AducksJson 'settings.json'
 $script:AducksQueries    = Read-AducksJson 'queries.json'
 $script:AducksCategories = $script:AducksQueries.categories

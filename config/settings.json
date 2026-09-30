@@ -1,5 +1,5 @@
 {
-  "_note": "Default settings. On first run Aducks copies this to settings.json (per-machine, not committed); edit that file or use the in-app Settings. Relaunch Aducks after editing by hand. (Graph endpoints and internal timings are built in - not configurable here on purpose.)",
+  "_note": "User-editable settings for Aducks (or use the in-app Settings). Relaunch Aducks after editing by hand. (Graph endpoints and internal timings are built in - not configurable here on purpose.)",
 
   "_browser_note": "Which browser to launch for login. Must be Chromium-based (login capture uses the DevTools protocol). Use 'edge', 'chrome', or a full path to a Chromium browser exe.",
   "Browser": "edge",

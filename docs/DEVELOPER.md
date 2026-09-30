@@ -63,9 +63,7 @@ Every request is a GET. Query and Load more requests also send
 Aducks.bat                Launcher (hidden)
 Aducks-debug.bat          Launcher with console (shows startup errors)
 config/
-  settings.example.json   Default settings (committed)
-  settings.json           Per-machine copy of the above (git-ignored; created on
-                          first run): browser, sign-in selector, login wait
+  settings.json           Browser, sign-in selector, login wait (defaults: Edge)
   queries.json            Query catalog (edited via the in-app Query catalog)
 docs/
   DEVELOPER.md            This file

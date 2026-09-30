@@ -48,8 +48,8 @@ needed, and there is nothing to install. It runs on the Windows PowerShell and
 .NET that are built into Windows.
 
 > **Copying your Aducks folder to someone?** Your browser choice is saved in
-> `config\settings.json`. Delete that file first so they start with the default
-> (Edge), or check [Settings](#settings) on their PC.
+> `config\settings.json` and goes with it. If you changed it from the default
+> (Edge), check [Settings](#settings) on their PC.
 
 ---
 

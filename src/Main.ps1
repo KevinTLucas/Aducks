@@ -134,12 +134,13 @@ function Initialize-WindowChrome {
                 $one = 1
                 [void][Aducks.Native]::DwmSetWindowAttribute($h, 20, [ref]$one, 4)  # dark mode (Win11 / Win10 2004+)
                 [void][Aducks.Native]::DwmSetWindowAttribute($h, 19, [ref]$one, 4)  # dark mode (older builds)
-                # Win11 22000+: colour the title bar to match the app (near-invisible)
-                # with off-white text. COLORREF is 0x00BBGGRR.
+                # Win11 22000+: colour the title bar to match the app (near-invisible).
+                # Title text is drawn in the same colour, so no label shows in the
+                # bar while Title still names the window in the taskbar / Alt+Tab.
+                # COLORREF is 0x00BBGGRR.
                 $capt = 0x1B110C   # #0C111B (app backdrop)
-                $txt  = 0xF6EEEA   # #EAEEF6 (app text, reads white)
                 [void][Aducks.Native]::DwmSetWindowAttribute($h, 35, [ref]$capt, 4)  # DWMWA_CAPTION_COLOR
-                [void][Aducks.Native]::DwmSetWindowAttribute($h, 36, [ref]$txt,  4)  # DWMWA_TEXT_COLOR
+                [void][Aducks.Native]::DwmSetWindowAttribute($h, 36, [ref]$capt, 4)  # DWMWA_TEXT_COLOR (hidden)
                 [void][Aducks.Native]::DwmSetWindowAttribute($h, 34, [ref]$capt, 4)  # DWMWA_BORDER_COLOR
             }
         } catch { }
