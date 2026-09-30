@@ -22,7 +22,12 @@ $ModulesRoot = Join-Path $ScriptRoot 'modules'
 $UiRoot      = Join-Path $ScriptRoot 'ui'
 
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase, System.Xaml
-Add-Type -Path (Join-Path $ScriptRoot 'lib\Newtonsoft.Json.dll')   # hardened JSON parse/format
+# A downloaded ZIP marks every file "from the internet" (Zone.Identifier), and
+# .NET refuses to load a DLL with that mark (0x80131515). Clear the mark on the
+# app's own files (also stops the .bat security prompt next launch), and load
+# the DLL from bytes, which works even if unblocking fails (read-only folder).
+Get-ChildItem (Split-Path $ScriptRoot -Parent) -Recurse -File -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue
+[void][System.Reflection.Assembly]::Load([System.IO.File]::ReadAllBytes((Join-Path $ScriptRoot 'lib\Newtonsoft.Json.dll')))   # hardened JSON parse/format
 
 # Native calls: DWM title-bar theming, and an explicit AppUserModelID so the
 # taskbar shows this window's icon instead of PowerShell's host icon.

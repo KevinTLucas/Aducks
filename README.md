@@ -19,11 +19,10 @@ permissions an admin must approve; see [Troubleshooting](#troubleshooting).)
 
 1. **Get Aducks.** On the GitHub page click **Code > Download ZIP**, or clone
    it with `git clone https://github.com/KevinTLucas/Aducks.git`.
-   - **Downloaded the ZIP?** Before extracting, right-click the ZIP, choose
-     **Properties**, tick **Unblock**, then **OK**. Windows marks downloaded
-     files as "from the internet", and that blocks Aducks' JSON component from
-     loading. Already extracted it? Run this in PowerShell inside the folder:
-     `Get-ChildItem -Recurse | Unblock-File`
+   - **Downloaded the ZIP?** Extract it first (don't run it from inside the ZIP).
+     On the first launch Windows may show an *Open File - Security Warning*;
+     click **Run**. Aducks then clears the "downloaded from the internet" mark
+     on its own files, so it won't ask again.
 2. Open the **Aducks** folder and double-click **`Aducks.bat`**. A black window
    may flash for a moment; that's normal.
 3. Click **Sign in with Microsoft**. The button changes to *Waiting for sign-in...*
